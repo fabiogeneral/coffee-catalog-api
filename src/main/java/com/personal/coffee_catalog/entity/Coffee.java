@@ -34,6 +34,9 @@ public class Coffee {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
+  @Column(name = "roaster_id", nullable = false)
+  private Integer roasterId;
+
   @Column(nullable = false)
   @NotBlank(message = "Coffee name is required")
   @Size(max = 255, message = "Name must be less than 255 characters")
