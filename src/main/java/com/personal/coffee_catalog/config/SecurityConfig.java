@@ -2,9 +2,12 @@ package com.personal.coffee_catalog.config;
 
 import com.personal.coffee_catalog.repository.UserRepository;
 import com.personal.coffee_catalog.service.JwtService;
+import jakarta.servlet.http.HttpServletResponse;
+import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -66,6 +69,24 @@ public class SecurityConfig {
       )
       .sessionManagement(session -> session
         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+      )
+      .exceptionHandling(exception -> exception
+        .authenticationEntryPoint((
+          request,
+          response,
+          authException
+        ) -> {
+          response.setContentType("application/json");
+          response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+          String errorJson = String.format(
+            "{\"timestamp\": \"%s\",\"status\": \"%s\",\"error\": \"%s\",\"message\": \"%s\"}",
+            LocalDateTime.now(),
+            HttpStatus.UNAUTHORIZED.value(),
+            "Unauthorized",
+            "Invalid or Expired Token. Try to refresh the access token or login again."
+          );
+          response.getWriter().write(errorJson);
+        })
       )
       .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
 

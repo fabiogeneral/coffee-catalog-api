@@ -66,7 +66,6 @@ public class GlobalExceptionHandler {
       .body(errorResponse);
   }
 
-
   /**
    * Handle validation errors from @Valid annotation Returns 400 Bad Request with field-specific
    * errors
@@ -121,6 +120,32 @@ public class GlobalExceptionHandler {
     return ResponseEntity
       .status(HttpStatus.BAD_REQUEST)
       .body(errorResponse);
+  }
+
+  /**
+   * Handle TokenRefreshException Returns 403 Forbidden
+   */
+  @ExceptionHandler(TokenRefreshException.class)
+  public ResponseEntity<Map<String, Object>> handleTokenRefreshException(TokenRefreshException ex) {
+    Map<String, Object> body = new HashMap<>();
+    body.put("timestamp", LocalDateTime.now());
+    body.put("message", ex.getMessage());
+    body.put("status", HttpStatus.FORBIDDEN.value());
+
+    return new ResponseEntity<>(body, HttpStatus.FORBIDDEN);
+  }
+
+  /**
+   * Handle RuntimeException Returns 400 Bad Request
+   */
+  @ExceptionHandler(RuntimeException.class)
+  public ResponseEntity<Map<String, Object>> handleRuntimeException(RuntimeException ex) {
+    Map<String, Object> body = new HashMap<>();
+    body.put("timestamp", LocalDateTime.now());
+    body.put("message", ex.getMessage());
+    body.put("status", HttpStatus.BAD_REQUEST.value());
+
+    return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
   }
 
   /**

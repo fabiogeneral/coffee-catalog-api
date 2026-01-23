@@ -4,7 +4,6 @@ CREATE TABLE users
     id         BIGSERIAL PRIMARY KEY,
     email      VARCHAR(255) UNIQUE NOT NULL,
     password   VARCHAR(255)        NOT NULL,
-    username   VARCHAR(255),                                -- email
     first_name VARCHAR(100),
     last_name  VARCHAR(100),
     role       VARCHAR(50)         NOT NULL DEFAULT 'USER', -- USER, ROASTER, ADMIN
@@ -107,4 +106,20 @@ CREATE TABLE favorites
     coffee_id  BIGINT    NOT NULL REFERENCES coffees (id) ON DELETE CASCADE,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     UNIQUE (user_id, coffee_id)
+);
+
+-- Refresh tokens table for JWT token management
+CREATE TABLE refresh_tokens
+(
+    id          BIGSERIAL PRIMARY KEY,
+    token       VARCHAR(255) NOT NULL UNIQUE,
+    user_id     BIGINT       NOT NULL,
+    expiry_date TIMESTAMP    NOT NULL,
+    revoked     BOOLEAN      NOT NULL DEFAULT FALSE,
+    created_at  TIMESTAMP             DEFAULT CURRENT_TIMESTAMP,
+    updated_at  TIMESTAMP             DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_user
+        FOREIGN KEY (user_id)
+            REFERENCES users (id)
+            ON DELETE CASCADE
 );
